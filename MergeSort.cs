@@ -1,56 +1,68 @@
-﻿namespace SortingAlgorithms
+﻿namespace SortingAlgorithms;
+
+internal class MergeSort : ArraySwap
 {
-    internal class MergeSort : ArraySwap
+    public static Movie[] Sort(Movie[] movieArr, Order order)
     {
+        if (movieArr.Length <= 1)
+            return movieArr;
+        var movieArrays = Divide(movieArr);
+        movieArrays.Item1 = Sort(movieArrays.Item1, order);
+        movieArrays.Item2 = Sort(movieArrays.Item2, order);
+        var result = Merge(movieArrays.Item1, movieArrays.Item2, order);
+        return result;
+    }
 
-        public static void Sort(Movie[] movies, Order order)
-        {
-            Sort(movies, 0, movies.Length - 1, order);
-        }
+    private static (Movie[], Movie[]) Divide(Movie[] movieArr)
+    {
+        var len1 = movieArr.Length / 2;
+        var len2 = movieArr.Length - len1;
+        var array1 = new Movie[len1];
+        var array2 = new Movie[len2];
+        for (var i = 0; i < len1; i++)
+            array1[i] = movieArr[i];
+        for (var i = 0; i < len2; i++)
+            array2[i] = movieArr[len1 + i - 1];
+        return (array1, array2);
+    }
 
-        private static void Sort(Movie[] movies, int left, int right, Order order)
+    private static Movie[] Merge(Movie[] array1, Movie[] array2, Order order)
+    {
+        var len = array1.Length + array2.Length;
+        var result = new Movie[len];
+        int i = 0, j = 0, k = 0;
+        bool sortingCondition;
+        while (i < array1.Length && j < array2.Length)
         {
-            if (left < right)
+            sortingCondition = order == Order.ascending ? array1[i] <= array2[j] : array1[i] >= array2[j];
+            if (sortingCondition)
             {
-                int mid = (left + right) / 2;
-                Sort(movies, left, mid, order);
-                Sort(movies, mid + 1, right, order);
-                Merge(movies, left, mid, right, order);
+                result[k] = array1[i];
+                i++;
             }
-        }
-
-        private static void Merge(Movie[] movies, int left, int mid, int right, Order order)
-        {
-            int len1 = mid - left + 1;
-            int len2 = right - mid;
-            var leftArr = new Movie[len1];
-            var rightArr = new Movie[len2];
-            int i, j;
-
-            for (i = 0; i < len1; ++i)
-                leftArr[i] = movies[left + i];
-            for (j = 0; j < len2; ++j)
-                rightArr[j] = movies[mid + 1 + j];
-
-            i = j = 0;
-            int k = left;
-            bool sortingCondition;
-
-            while (i < len1 && j < len2)
+            else
             {
-                sortingCondition = (order == Order.descending)
-                    ? (leftArr[i].Rating >= rightArr[j].Rating)
-                    : leftArr[i].Rating <= rightArr[j].Rating;
-                if (sortingCondition)
-                    movies[k++] = leftArr[i++];
-                else
-                    movies[k++] = rightArr[j++];
+                result[k] = array2[j];
+                j++;
             }
 
-            while (i < len1)
-                movies[k++] = leftArr[i++];
-            while (j < len2)
-                movies[k++] = rightArr[j++];
+            k++;
         }
+
+        while (i < array1.Length)
+        {
+            result[k] = array1[i];
+            i++;
+            k++;
+        }
+
+        while (j < array2.Length)
+        {
+            result[k] = array2[j];
+            j++;
+            k++;
+        }
+
+        return result;
     }
 }
