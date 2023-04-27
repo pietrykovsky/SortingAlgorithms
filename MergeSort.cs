@@ -1,6 +1,6 @@
 ﻿namespace SortingAlgorithms;
 
-internal class MergeSort : ArraySwap
+internal class MergeSort
 {
     public static Movie[] Sort(Movie[] movieArr, Order order)
     {

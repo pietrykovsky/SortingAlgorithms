@@ -35,7 +35,7 @@
             // Sort the buckets using QuickSort
             foreach (List<Movie> bucket in buckets)
             {
-                QuickSort.Sort(bucket.ToArray(), order);
+               // QuickSort.Sort(bucket.ToArray(), order);
             }
 
             // Concatenate the sorted buckets to get the sorted array

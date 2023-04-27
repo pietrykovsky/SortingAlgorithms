@@ -1,68 +1,52 @@
 ﻿namespace SortingAlgorithms
 {
-    internal class QuickSort : ArraySwap
+    internal class QuickSort
     {
-        public static void Sort(Movie[] movies, Order order)
-        {
-            Sort(movies, 0, movies.Length - 1, order);
-        }
 
-        /* private static void Sort(Movie[] movies, int left, int right, Order order)
-         {
-             if (left < right)
-             {
-                 int pivotIndex = Partition(movies, left, right, order);
-                 Sort(movies, left, pivotIndex - 1, order);
-                 Sort(movies, pivotIndex + 1, right, order);
-             }
-         }*/
-
-        private static void Sort(Movie[] movies, int left, int right, Order order)
+        public static void Sort(LinkedList<Movie> movieList, Order order)
         {
-            if (left < right)
+            if (movieList.Count <= 1)
+                return;
+            var pivot = movieList.Last();
+            var L = new LinkedList<Movie>();
+            var E = new LinkedList<Movie>();
+            var G = new LinkedList<Movie>();
+            while (movieList.Count > 0)
             {
-                int i = left;
-                int j = right;
-                Movie pivot = movies[left];
-
-                while (i <= j)
+                var condition = order == Order.ascending ? movieList.Last() < pivot : movieList.Last() > pivot;
+                if (condition)
                 {
-                    while ((order == Order.ascending && movies[i] < pivot) || (order == Order.descending && movies[i] > pivot))
-                        i++;
-
-                    while ((order == Order.ascending && movies[j] > pivot) || (order == Order.descending && movies[j] < pivot))
-                        j--;
-
-                    if (i <= j)
-                    {
-                        Swap(movies, i, j);
-                        i++;
-                        j--;
-                    }
+                    L.AddLast(movieList.Last());
+                    movieList.RemoveLast();
                 }
-
-                Sort(movies, left, j, order);
-                Sort(movies, i, right, order);
-            }
-        }
-
-
-        private static int Partition(Movie[] movies, int left, int right, Order order)
-        {
-            Movie pivotObject = movies[right];
-            int pivotIndex = left - 1;
-
-            for (int i = left; i <= right - 1; i++)
-            {
-                bool sortingCondition = (order == Order.descending) ? (movies[i] >= pivotObject) : movies[i] <= pivotObject;
-                if (sortingCondition)
+                else if (movieList.Last() == pivot)
                 {
-                    pivotIndex++;
-                    Swap(movies, i, pivotIndex);
+                    E.AddLast(movieList.Last());
+                    movieList.RemoveLast();
+                }
+                else
+                {
+                    G.AddLast(movieList.Last());
+                    movieList.RemoveLast();
                 }
             }
-            Swap(movies, pivotIndex + 1, right);
-            return pivotIndex + 1;
+            Sort(L, order);
+            Sort(G, order);
+            while (L.Count > 0)
+            {
+                movieList.AddLast(L.First());
+                L.RemoveFirst();
+            }
+            while (E.Count > 0)
+            {
+                movieList.AddLast(E.First());
+                E.RemoveFirst();
+            }
+            while (G.Count > 0)
+            {
+                movieList.AddLast(G.First());
+                G.RemoveFirst();
+            }
         }
     }
 }

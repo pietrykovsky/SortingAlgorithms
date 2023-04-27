@@ -21,4 +21,6 @@ internal class Movie
     public static bool operator >(Movie a, Movie b) => a.Rating > b.Rating;
     public static bool operator <=(Movie a, Movie b) => a.Rating <= b.Rating;
     public static bool operator >=(Movie a, Movie b) => a.Rating >= b.Rating;
+    public static bool operator ==(Movie a, Movie b) => a.Rating == b.Rating;
+    public static bool operator !=(Movie a, Movie b) => a.Rating != b.Rating;
 }
