@@ -2,24 +2,28 @@
 {
     internal class QuickSort : ArraySwap
     {
-        public static void Sort(Movie[] movies, Order order)
+        public static Movie[] Sort(Movie[] movieArr, Order order)
         {
+            var movies = new Movie[movieArr.Length];
+            movieArr.CopyTo(movies, 0);
             Sort(movies, 0, movies.Length - 1, order);
+            return movies;
         }
 
-        /* private static void Sort(Movie[] movies, int left, int right, Order order)
-         {
-             if (left < right)
-             {
-                 int pivotIndex = Partition(movies, left, right, order);
-                 Sort(movies, left, pivotIndex - 1, order);
-                 Sort(movies, pivotIndex + 1, right, order);
-             }
-         }*/
+       /* private static void Sort(Movie[] movies, int left, int right, Order order)
+        {
+            if (left < right)
+            {
+                int pivotIndex = Partition(movies, left, right, order);
+                Sort(movies, left, pivotIndex - 1, order);
+                Sort(movies, pivotIndex + 1, right, order);
+            }
+        }*/
 
         private static void Sort(Movie[] movies, int left, int right, Order order)
         {
-            if (left < right)
+            if (left >= right || left < 0)
+                return;
             {
                 int i = left;
                 int j = right;

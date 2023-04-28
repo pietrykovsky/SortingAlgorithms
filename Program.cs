@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Globalization;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace SortingAlgorithms;
 public enum Order
@@ -11,19 +12,18 @@ public enum Order
 internal class Program
 {
     private const string FilePath = @"C:\Users\mivva\Desktop\projekty\C#\SortingAlgorithms\data.csv";
-    private const int ArraySize = 500_000;
-
     private static void Main(string[] args)
     {
         var movieData = ReadCSVFile(FilePath);
         var sampleLengths = new int[] {1_000, 10_000, 100_000, 500_000};
         var iterations = 100;
+        
         TestSortingAlgorithms(movieData, iterations, sampleLengths);
     }
 
     private static void TestSortingAlgorithms(List<Movie> movieData, int iterations, int[] sampleLengths)
     {
-        var sortingAlgorithms = new Dictionary<string, Action<Movie[], Order>>
+        var sortingAlgorithms = new Dictionary<string, Func<Movie[], Order, Movie[]>>
         {
             { "Quicksort", QuickSort.Sort },
             { "Mergesort", MergeSort.Sort },
@@ -44,7 +44,7 @@ internal class Program
                 for (int i = 0; i < iterations; i++)
                 {
                     var movieArr = CreateMovieArray(movieData, length);
-                    var sortingTime = SortMovieArr(movieArr, Order.descending, sortingFunc);
+                    var sortingTime = SortMovieArr(ref movieArr, Order.descending, sortingFunc);
                     averageRating = GetAverage(movieArr);
                     medianRating = GetMedian(movieArr);
                     Console.WriteLine("{0,10} {1,20}", i+1, sortingTime.ToString(CultureInfo.InvariantCulture));
@@ -144,11 +144,11 @@ internal class Program
         return (movieArr[size / 2].Rating + movieArr[size / 2 + 1].Rating) / 2;
     }
 
-    private static double SortMovieArr(Movie[] movieArr, Order order, Action<Movie[], Order> sortFunction)
+    private static double SortMovieArr(ref Movie[] movieArr, Order order, Func<Movie[], Order, Movie[]> sortFunction)
     {
         var watch = new Stopwatch();
         watch.Start();
-        sortFunction(movieArr, order);
+        movieArr = sortFunction(movieArr, order);
         watch.Stop();
         return watch.ElapsedMilliseconds;
     }
