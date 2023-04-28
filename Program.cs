@@ -15,8 +15,8 @@ internal class Program
     private static void Main(string[] args)
     {
         var movieData = ReadCSVFile(FilePath);
-        var sampleLengths = new int[] {1_000, 10_000, 100_000, 500_000};
-        var iterations = 100;
+        var sampleLengths = new int[] {1_000, 10_000, 50_000, 100_000, 500_000, 1_000_000};
+        var iterations = 10;
         
         TestSortingAlgorithms(movieData, iterations, sampleLengths);
     }
