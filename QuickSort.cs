@@ -1,6 +1,6 @@
 ﻿namespace SortingAlgorithms
 {
-    internal class QuickSort
+    internal class QuickSort : ArraySwap
     {
         public static Movie[] Sort(Movie[] movieArr, Order order)
         {
@@ -11,16 +11,29 @@
         }
 
 
-        public static void Sort(LinkedList<Movie> movieList, Order order)
+        private static void Sort(Movie[] movies, int left, int right, Order order)
         {
             if (left >= right || left < 0)
                 return;
             {
-                var condition = order == Order.ascending ? movieList.Last() < pivot : movieList.Last() > pivot;
-                if (condition)
+                int i = left;
+                int j = right;
+                Movie pivot = movies[left];
+
+                while (i <= j)
                 {
-                    L.AddLast(movieList.Last());
-                    movieList.RemoveLast();
+                    while ((order == Order.ascending && movies[i] < pivot) || (order == Order.descending && movies[i] > pivot))
+                        i++;
+
+                    while ((order == Order.ascending && movies[j] > pivot) || (order == Order.descending && movies[j] < pivot))
+                        j--;
+
+                    if (i <= j)
+                    {
+                        Swap(movies, i, j);
+                        i++;
+                        j--;
+                    }
                 }
 
                 Sort(movies, left, j, order);
