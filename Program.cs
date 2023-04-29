@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Globalization;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace SortingAlgorithms;
 public enum Order
@@ -13,10 +12,10 @@ internal class Program
 {
     private const string FilePath = @"C:\Users\mivva\Desktop\projekty\C#\SortingAlgorithms\data.csv";
     private static void Main(string[] args)
-    {
+    {   
         var movieData = ReadCSVFile(FilePath);
-        var sampleLengths = new int[] {1_000, 10_000, 50_000, 100_000, 500_000, 1_000_000};
-        var iterations = 10;
+        var sampleLengths = new int[] {1_000, 10_000, 50_000, 100_000, 500_000, 1_000_000, 2_000_000};
+        var iterations = 20;
         
         TestSortingAlgorithms(movieData, iterations, sampleLengths);
     }
@@ -39,6 +38,7 @@ internal class Program
                 var averageSortingTime = 0d;
                 float averageRating = 0, medianRating = 0;
                 bool isSorted = false;
+                int size = 0;
                 Console.WriteLine($"\n----{funcName} - data size {length}----");
                 Console.WriteLine("\n{0,10} {1,20}", "Iteration", "Sorting Time (ms)");
                 for (int i = 0; i < iterations; i++)
@@ -49,6 +49,7 @@ internal class Program
                     medianRating = GetMedian(movieArr);
                     Console.WriteLine("{0,10} {1,20}", i+1, sortingTime.ToString(CultureInfo.InvariantCulture));
                     averageSortingTime += sortingTime;
+                    size = movieArr.Length;
                     isSorted = IsSorted(movieArr, Order.descending);
                 }
                 averageSortingTime /= iterations;
@@ -56,6 +57,7 @@ internal class Program
                 Console.WriteLine($"average time: {averageSortingTime.ToString(CultureInfo.InvariantCulture)} ms");
                 Console.WriteLine($"average rating: {averageRating.ToString(CultureInfo.InvariantCulture)}");
                 Console.WriteLine($"median rating: {medianRating.ToString(CultureInfo.InvariantCulture)}");
+                Console.WriteLine($"size: {size}");
                 Console.WriteLine($"sorted correctly: {isSorted}\n\n");
             }
         }
@@ -82,9 +84,11 @@ internal class Program
     private static List<Movie> ReadCSVFile(string filePath)
     {
         var data = new List<Movie>();
+        var watch = Stopwatch.StartNew();
+        var iterations = 0;
+        var count = 0;
         using (var reader = new StreamReader(filePath))
         {
-            var count = 0;
             while (!reader.EndOfStream)
             {
                 var line = reader.ReadLine();
@@ -98,8 +102,17 @@ internal class Program
                         title += $"{columns[i]}";
                     data.Add(new Movie(id, title, rating));
                 }
+                else
+                    count++;
+
+                iterations++;
             }
         }
+        watch.Stop();
+        var time = watch.ElapsedMilliseconds;
+        Console.WriteLine($"Time loading records for csv: {time} ms");
+        Console.WriteLine($"Records searched: {iterations}");
+        Console.WriteLine($"Records filtered out: {count}");
         return data;
     }
 
