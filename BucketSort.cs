@@ -2,9 +2,11 @@
 {
     internal class BucketSort
     {
-        public static void Sort(Movie[] movies, Order order)
+        public static Movie[] Sort(Movie[] movieArr, Order order)
         {
-            int numberOfBuckets = (int)Math.Sqrt(movies.Length);
+            int numberOfBuckets = 10;
+            var movies = new Movie[movieArr.Length];
+            movieArr.CopyTo(movies, 0);
             List<Movie>[] buckets = new List<Movie>[numberOfBuckets];
 
             // Initialize buckets
@@ -13,29 +15,17 @@
                 buckets[i] = new List<Movie>();
             }
 
-            // Calculate the range of the Ratings
-            float minValue = movies[0].Rating;
-            float maxValue = movies[0].Rating;
-
-            foreach (Movie movie in movies)
-            {
-                minValue = Math.Min(minValue, movie.Rating);
-                maxValue = Math.Max(maxValue, movie.Rating);
-            }
-
-            float range = maxValue - minValue;
-
             // Put the movies into the appropriate buckets
             foreach (Movie movie in movies)
             {
-                int bucketIndex = (int)((movie.Rating - minValue) / range * (numberOfBuckets - 1));
+                int bucketIndex = (int)movie.Rating-1;
                 buckets[bucketIndex].Add(movie);
             }
 
             // Sort the buckets using QuickSort
             foreach (List<Movie> bucket in buckets)
             {
-               // QuickSort.Sort(bucket.ToArray(), order);
+                MergeSort.Sort(bucket.ToArray(), order);
             }
 
             // Concatenate the sorted buckets to get the sorted array
@@ -61,6 +51,8 @@
                     }
                 }
             }
+
+            return movies;
         }
     }
 }

@@ -12,19 +12,18 @@ public enum Order
 internal class Program
 {
     private const string FilePath = @"C:\Users\mivva\Desktop\projekty\C#\SortingAlgorithms\data.csv";
-
     private static void Main(string[] args)
-    {
+    {   
         var movieData = ReadCSVFile(FilePath);
-        var sampleLengths = new int[] {1_000, 10_000, 100_000, 500_000};
-        var iterations = 100;
-
+        var sampleLengths = new int[] {1_000, 10_000, 50_000, 100_000, 500_000, 1_000_000, 2_000_000};
+        var iterations = 20;
+        
         TestSortingAlgorithms(movieData, iterations, sampleLengths);
     }
 
     private static void TestSortingAlgorithms(LinkedList<Movie> movieData, int iterations, int[] sampleLengths)
     {
-        var sortingAlgorithms = new Dictionary<string, Action<LinkedList<Movie>, Order>>
+        var sortingAlgorithms = new Dictionary<string, Func<Movie[], Order, Movie[]>>
         {
             { "Quicksort", QuickSort.Sort },
             //{ "Mergesort", MergeSort.Sort },
@@ -40,23 +39,26 @@ internal class Program
                 var averageSortingTime = 0d;
                 float averageRating = 0, medianRating = 0;
                 bool isSorted = false;
+                int size = 0;
                 Console.WriteLine($"\n----{funcName} - data size {length}----");
                 Console.WriteLine("\n{0,10} {1,20}", "Iteration", "Sorting Time (ms)");
                 for (int i = 0; i < iterations; i++)
                 {
-                    var movieList = Copy(movieData, length);
-                    var sortingTime = SortMovieList(movieList, Order.descending, sortingFunc);
-                    averageRating = GetAverage(movieList);
-                    medianRating = GetMedian(movieList);
+                    var movieArr = CreateMovieArray(movieData, length);
+                    var sortingTime = SortMovieArr(ref movieArr, Order.descending, sortingFunc);
+                    averageRating = GetAverage(movieArr);
+                    medianRating = GetMedian(movieArr);
                     Console.WriteLine("{0,10} {1,20}", i+1, sortingTime.ToString(CultureInfo.InvariantCulture));
                     averageSortingTime += sortingTime;
-                    isSorted = IsSorted(movieList, Order.descending);
+                    size = movieArr.Length;
+                    isSorted = IsSorted(movieArr, Order.descending);
                 }
                 averageSortingTime /= iterations;
                 Console.WriteLine($"\nResults for - {funcName} {length} records:");
                 Console.WriteLine($"average time: {averageSortingTime.ToString(CultureInfo.InvariantCulture)} ms");
                 Console.WriteLine($"average rating: {averageRating.ToString(CultureInfo.InvariantCulture)}");
                 Console.WriteLine($"median rating: {medianRating.ToString(CultureInfo.InvariantCulture)}");
+                Console.WriteLine($"size: {size}");
                 Console.WriteLine($"sorted correctly: {isSorted}\n\n");
             }
         }
@@ -102,7 +104,10 @@ internal class Program
 
     private static LinkedList<Movie> ReadCSVFile(string filePath)
     {
-        var data = new LinkedList<Movie>();
+        var data = new List<Movie>();
+        var watch = Stopwatch.StartNew();
+        var iterations = 0;
+        var count = 0;
         using (var reader = new StreamReader(filePath))
         {
             while (!reader.EndOfStream)
@@ -118,8 +123,17 @@ internal class Program
                         title += $"{columns[i]}";
                     data.AddLast(new Movie(id, title, rating));
                 }
+                else
+                    count++;
+
+                iterations++;
             }
         }
+        watch.Stop();
+        var time = watch.ElapsedMilliseconds;
+        Console.WriteLine($"Time loading records for csv: {time} ms");
+        Console.WriteLine($"Records searched: {iterations}");
+        Console.WriteLine($"Records filtered out: {count}");
         return data;
     }
 
@@ -155,11 +169,11 @@ internal class Program
         return (movieList.ElementAt(size / 2).Rating + movieList.ElementAt(size / 2 + 1).Rating) / 2;
     }
 
-    private static double SortMovieList(LinkedList<Movie> movieList, Order order, Action<LinkedList<Movie>, Order> sortFunction)
+    private static double SortMovieArr(ref Movie[] movieArr, Order order, Func<Movie[], Order, Movie[]> sortFunction)
     {
         var watch = new Stopwatch();
         watch.Start();
-        sortFunction(movieList, order);
+        movieArr = sortFunction(movieArr, order);
         watch.Stop();
         return watch.ElapsedMilliseconds;
     }

@@ -1,6 +1,5 @@
 ﻿namespace SortingAlgorithms;
-
-internal class MergeSort
+internal class MergeSort : ArraySwap
 {
     public static Movie[] Sort(Movie[] movieArr, Order order)
     {
@@ -22,7 +21,7 @@ internal class MergeSort
         for (var i = 0; i < len1; i++)
             array1[i] = movieArr[i];
         for (var i = 0; i < len2; i++)
-            array2[i] = movieArr[len1 + i - 1];
+            array2[i] = movieArr[len1 + i];
         return (array1, array2);
     }
 
